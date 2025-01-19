@@ -3,34 +3,16 @@ version: '3.8'
 services:
   mongodb:
     image: mongo:latest
+    container_name: mongodb
+    restart: always
     ports:
       - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
     volumes:
-      - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
-
-  report-parser:
-    build:
-      context: ./services/report-parser
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://admin:secret@mongodb:27017/admin
-      SPRING_PROFILES_ACTIVE: dev
-    depends_on:
-      - mongodb
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - report-parser
+      - ./data/mongodb:/data/db
 
 volumes:
   mongodb_data:
